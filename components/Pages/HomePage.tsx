@@ -25,7 +25,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const [sortKey, order] = sort.split("_");
-    fetchRepos("react", sortKey, parseSortOrder(order));
+    fetchRepos(query, sortKey, parseSortOrder(order));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort]);
 
