@@ -1,11 +1,12 @@
 import { Repo } from "@/types/repo/Repo";
+import { SortOrder } from "@/consts/enum";
 
 const BASE_URL = "https://api.github.com";
 
 export const searchRepositories = async (
   query: string,
   sort?: string,
-  order?: "asc" | "desc"
+  order?: SortOrder
 ): Promise<{ items: Repo[]; total_count: number }> => {
   const params = new URLSearchParams({
     q: query,

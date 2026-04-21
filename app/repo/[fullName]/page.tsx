@@ -1,5 +1,7 @@
 import { getRepositoryDetail } from "@/services/githubApi";
-import Link from "next/link";
+import AppButton from "@/components/AppButton/AppButton";
+import TagTopic from "@/components/TagTopic/TagTopic";
+import { notFound } from "next/navigation";
 
 type RepoDetailPageProps = {
   params: Promise<{ fullName: string }>;
@@ -7,18 +9,27 @@ type RepoDetailPageProps = {
 
 export default async function RepoDetail({ params }: RepoDetailPageProps) {
   const { fullName } = await params;
+
   const decodedFullName = decodeURIComponent(fullName);
-  const repo = await getRepositoryDetail(decodedFullName);
+  const [owner, name] = decodedFullName.split("/");
+
+  if (!owner || !name) {
+    notFound();
+  }
+
+  let repo;
+  try {
+    repo = await getRepositoryDetail(decodedFullName);
+  } catch {
+    notFound();
+  }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto  p-4">
       <div className="mb-4">
-        <Link
-          href="/"
-          className="inline-flex items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-        >
+        <AppButton href="/" center={false} textColor="text-slate-700" className="border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50">
           Back to results
-        </Link>
+        </AppButton>
       </div>
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-bold text-slate-900">{repo.full_name}</h1>
@@ -27,12 +38,7 @@ export default async function RepoDetail({ params }: RepoDetailPageProps) {
         <div className="mt-5 flex flex-wrap gap-2">
           {(repo.topics ?? []).length > 0 ? (
             repo.topics?.map((topic) => (
-              <span
-                key={topic}
-                className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
-              >
-                #{topic}
-              </span>
+              <TagTopic key={topic} label={topic} />
             ))
           ) : (
             <span className="text-sm text-slate-500">No topics</span>
@@ -51,14 +57,15 @@ export default async function RepoDetail({ params }: RepoDetailPageProps) {
         </div>
 
         <div className="mt-6">
-          <Link
+          <AppButton
             href={repo.html_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+            center={false}
+            className="bg-slate-900 px-4 py-2 text-sm hover:bg-slate-700"
           >
             View on GitHub
-          </Link>
+          </AppButton>
         </div>
       </div>
     </div>

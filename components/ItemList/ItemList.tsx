@@ -1,13 +1,13 @@
 import { Repo } from "@/types/repo/Repo";
+import { RequestStatus } from "@/consts/enum";
 import { useRouter } from "next/navigation";
-
 
 type ItemListProps = {
   repos: Repo[];
   sort?: string;
   setSort?: (sort: string) => void;
   total?: number;
-  status?: "idle" | "loading" | "success" | "error";
+  status?: RequestStatus;
   error?: string | null;
 };
 
@@ -35,12 +35,12 @@ function ItemList({ repos, sort, setSort, total, status, error }: ItemListProps)
       </div>
       {/* result list */}
       <div className="p-4 grid gap-4">
-        {status === "error" && (
+        {status === RequestStatus.Error && (
           <div className="rounded-xl border border-dashed p-6 text-center text-sm text-red-400">
             {error || "Something went wrong. Please try again."}
           </div>
         )}
-        {status === "success" && repos.length === 0 && (
+        {status === RequestStatus.Success && repos.length === 0 && (
           <div className="rounded-xl border border-dashed p-6 text-center text-sm text-gray-500">
             No repositories found. Try another keyword.
           </div>

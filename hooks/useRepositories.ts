@@ -1,27 +1,28 @@
 import { useState } from "react";
 import { searchRepositories } from "@/services/githubApi";
 import { Repo } from "@/types/repo/Repo";
-
-type Status = "idle" | "loading" | "success" | "error";
+import { RequestStatus, SortOrder } from "@/consts/enum";
 
 export const useRepositories = () => {
     const [repos, setRepos] = useState<Repo[]>([]);
     const [total, setTotal] = useState(0);
-    const [status, setStatus] = useState<Status>("idle");
+    const [status, setStatus] = useState<RequestStatus>(RequestStatus.Idle);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchRepos = async (query: string, sort?: string, order?: "asc" | "desc") => {
+    const fetchRepos = async (query: string, sort?: string, order?: SortOrder) => {
         try {
-            setStatus("loading");
+            setStatus(RequestStatus.Loading);
             setError(null);
             const finalQuery = query.trim() || "react";
             const data = await searchRepositories(finalQuery, sort, order);
             setRepos(data.items);
             setTotal(data.total_count);
-            setStatus("success");
+            setStatus(RequestStatus.Success);
 
         } catch (err) {
-            setStatus("error");
+            setRepos([]);
+            setTotal(0);
+            setStatus(RequestStatus.Error);
             setError((err as Error).message);
         }
     };
